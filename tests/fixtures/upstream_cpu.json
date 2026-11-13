@@ -1,0 +1,18 @@
+{
+  "source": "AndreasXi/FineLAP",
+  "revision": "b419aa22947d29907a5567f21b81bf3b39a40449",
+  "torch": "2.7.0+cu126",
+  "transformers": "4.57.6",
+  "device": "cpu",
+  "thread_count": 4,
+  "phrase": "A sine tone sounds.",
+  "audio": "tone_silence.wav",
+  "full_frame_shape": [
+    1,
+    1,
+    64
+  ],
+  "clip_score": [
+    0.04258187487721443
+  ]
+}

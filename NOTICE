@@ -1,0 +1,8 @@
+FineLAP model and research: xiquan-li and FineLAP contributors.
+Source: https://github.com/xiquan-li/FineLAP
+Checkpoint: https://huggingface.co/AndreasXi/FineLAP
+
+This package contains only new inference wrapper code. It does not include the
+author model implementation or model weights. Loading the model executes the
+author's pinned Hugging Face remote code. Upstream code license remains unclear;
+this package stays private pending rights clarification.

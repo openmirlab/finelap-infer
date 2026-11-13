@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "finelap-infer"
+dynamic = ["version"]
+description = "Inference-only FineLAP localization for short and long audio"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "LicenseRef-Private-Evaluation"
+authors = [{name = "FineLAP authors"}]
+maintainers = [{name = "openmirlab"}]
+dependencies = [
+  "huggingface-hub>=0.30",
+  "numpy>=1.26",
+  "soundfile>=0.12",
+  "torch>=2.0",
+  "timm>=1.0",
+  # Temporary 5.x cap: pinned upstream remote code fails with Transformers 5.x.
+  # Track removal in docs/compatibility.md after upstream parity is verified.
+  "transformers>=4.56.2,<5",
+]
+
+[project.optional-dependencies]
+# Upstream's pinned model code imports torchaudio. Keep this compiled dependency
+# outside the base install; loading the model without it raises an install hint.
+model = ["torchaudio>=2.0"]
+dev = ["build>=1.3", "pytest>=8", "ruff>=0.8"]
+
+[project.scripts]
+finelap-infer = "finelap_infer.cli:main"
+
+[tool.hatch.version]
+path = "src/finelap_infer/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/finelap_infer"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/finelap_infer/config/checkpoints.toml" = "finelap_infer/config/checkpoints.toml"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/", "tests/", "docs/", "README.md", "CLAUDE.md", "CHANGELOG.md", "LICENSE", "NOTICE", "pyproject.toml", ".gitignore", ".python-version"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["model: loads the actual FineLAP checkpoint"]
+addopts = "-m 'not model'"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100

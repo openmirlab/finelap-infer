@@ -1,0 +1,11 @@
+# Pinned author checkpoint. Model implementation is loaded from this HF snapshot;
+# its code is not copied into this package while upstream code licensing is unclear.
+[model]
+repo_id = "AndreasXi/FineLAP"
+revision = "b419aa22947d29907a5567f21b81bf3b39a40449"
+weight_file = "model.safetensors"
+sha256 = "13b9646c9f9d48513c0145bed75e654179e83f0fd8d49ed4ffc5d6b8f3353fb4"
+url = "https://huggingface.co/AndreasXi/FineLAP/resolve/b419aa22947d29907a5567f21b81bf3b39a40449/model.safetensors"
+source = "FineLAP author Hugging Face repository"
+license = "HF card says MIT; model-code repository has no LICENSE at verification"
+updated = "2026-11-13"
