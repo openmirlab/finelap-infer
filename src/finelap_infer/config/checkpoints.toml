@@ -1,11 +1,25 @@
-# Pinned author checkpoint. Model implementation is loaded from this HF snapshot;
-# its code is not copied into this package while upstream code licensing is unclear.
+# Pinned author checkpoint. Required model implementation is in this package.
 [model]
 repo_id = "AndreasXi/FineLAP"
 revision = "b419aa22947d29907a5567f21b81bf3b39a40449"
 weight_file = "model.safetensors"
 sha256 = "13b9646c9f9d48513c0145bed75e654179e83f0fd8d49ed4ffc5d6b8f3353fb4"
+config_sha256 = "6924dbb87747e989eaf0510fbeecd0407d2f18a085c8de3976a5d2e0b68da9cd"
 url = "https://huggingface.co/AndreasXi/FineLAP/resolve/b419aa22947d29907a5567f21b81bf3b39a40449/model.safetensors"
 source = "FineLAP author Hugging Face repository"
-license = "HF card says MIT; model-code repository has no LICENSE at verification"
+license = "HF model repository declares MIT; GitHub source has no LICENSE"
 updated = "2026-11-13"
+
+[text]
+repo_id = "roberta-base"
+revision = "e2da8e2f811d1448a5b465c236feacd80ffbac7b"
+source = "RoBERTa config and tokenizer only; text encoder weights come from FineLAP checkpoint"
+license = "MIT per Hugging Face model card"
+updated = "2026-11-13"
+
+[text.files]
+"config.json" = "ef0185e2aae6e06c5f105a285006952c340e20c7dbf43c86ec82601b13fc45e9"
+"vocab.json" = "9e7f63c2d15d666b52e21d250d2e513b87c9b713cfa6987a82ed89e5e6e50655"
+"merges.txt" = "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5"
+"tokenizer.json" = "847bbeab6174d66a88898f729d52fa8d355fafe1bea101cf960dd404581df70e"
+"tokenizer_config.json" = "994f46754c5bf4014f1aa92d34b1374319c3a6b3f702105cd5b742beaecd18ce"

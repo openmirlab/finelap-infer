@@ -2,10 +2,16 @@ FineLAP model and research: xiquan-li and FineLAP contributors.
 Source: https://github.com/xiquan-li/FineLAP
 Checkpoint: https://huggingface.co/AndreasXi/FineLAP
 
-This public repository contains only original inference wrapper code under
-the repository's MIT license. It does not include the author model
-implementation or model weights. Loading the model fetches and executes the
-author's pinned Hugging Face remote code. The author GitHub source repository
-has no explicit LICENSE as of 2026-11-13, despite the Hugging Face model
-card's MIT tag. This MIT license covers only the wrapper in this repository;
-it does not grant rights to third-party code or model assets.
+This repository adapts the inference-required Python files from the author's
+Hugging Face model repository `AndreasXi/FineLAP` at revision
+`b419aa22947d29907a5567f21b81bf3b39a40449`. That repository's model card
+declares MIT. The files are under `src/finelap_infer/_impl/`; see
+`docs/source-provenance.md` for exact source hashes and changes. Training,
+evaluation, dataset and plotting code are not included. The package's
+original wrapper code is by openmirlab contributors.
+
+No model weights are bundled. The author GitHub source repository still has no
+explicit LICENSE as of 2026-11-13; the Hugging Face model card's MIT metadata
+is the recorded permission basis for these specific Hugging Face files. Seek
+author confirmation before mirroring other upstream code or publishing to PyPI.
+The MIT source license does not grant rights to unrelated third-party assets.
