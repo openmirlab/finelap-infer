@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Reorganized the README around upstream credit, citation, public GitHub installation, usage, weights, development, license, and support.
+
 ## 0.1.0 — 2026-11-13
 
 - Initial inference-only wrapper for pinned FineLAP author checkpoint; public
