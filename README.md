@@ -1,6 +1,6 @@
 # finelap-infer
 
-Public, standalone, inference-only wrapper for [FineLAP](https://github.com/xiquan-li/FineLAP). It maps FineLAP's dense audio–text scores onto the input file clock and processes files longer than the upstream model's approximately 10-second frontend limit. The model and its research belong to the FineLAP authors.
+Public, standalone, inference-only package of the [FineLAP](https://github.com/xiquan-li/FineLAP) model core. It maps FineLAP's dense audio–text scores onto the input file clock and processes files longer than the upstream model's approximately 10-second frontend limit. The model and its research belong to the FineLAP authors.
 
 **Status:** public inference-only source repository; no PyPI release. The six model implementation files needed for inference are adapted from the fixed author [Hugging Face snapshot](https://huggingface.co/AndreasXi/FineLAP), whose model card declares MIT. The separate [GitHub research repo](https://github.com/xiquan-li/FineLAP) has no explicit LICENSE as checked 2026-11-13; we do not copy from that tree. We do not bundle or mirror checkpoint weights. See [source provenance](docs/source-provenance.md) and [NOTICE](NOTICE).
 
