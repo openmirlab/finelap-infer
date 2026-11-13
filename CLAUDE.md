@@ -1,14 +1,14 @@
 # finelap-infer maintainer guide
 
-Public standalone inference-only wrapper for FineLAP. Read README and `docs/compatibility.md` before changes. The upstream author model is loaded from the fixed HF revision in `src/finelap_infer/config/checkpoints.toml`; no upstream code or weights are vendored. The repository's MIT license covers our wrapper only. GitHub FineLAP's missing explicit code LICENSE still blocks vendoring or mirroring upstream code pending clarification; the HF model card's MIT tag does not settle that source-code issue.
+Public standalone inference-only package for FineLAP. Read README, `docs/compatibility.md` and `docs/source-provenance.md` before changes. The inference-required author Python files were extracted from the MIT-tagged Hugging Face snapshot in `src/finelap_infer/config/checkpoints.toml` into `_impl/`. The separate GitHub research tree has no explicit LICENSE and is not the code source. Weights are never bundled. Do not add upstream training/evaluation code or mirror weights. Confirm rights with the author before a PyPI release.
 
 ## Scope and lifecycle
 
 - Only localization and its native score/time semantics. No training, fine-tuning, datasets, evaluation or experiment commands in the installed surface.
-- `checkpoints.py` owns one resolver shared by load and cache inspection. `session.py` owns lifecycle, device, windowing and upstream calls. `results.py` owns output meanings. CLI delegates to the session.
+- `checkpoints.py` owns the two verified asset resolvers shared by load and cache inspection. `session.py` owns lifecycle, device, windowing and calls into the local `_impl` model. `results.py` owns output meanings. CLI delegates to the session.
 - 10-second windows, 8-second hop, 0.16-second nominal score bins. Overlap uses max. Event intervals are thresholded nominal bins, not sample-accurate boundaries or calibrated probabilities.
 - Use local fixed-revision source for tests. Any change to model code/dependencies, windowing, score interpretation or timing must refresh source evidence and upstream parity.
-- The source repository is public. No PyPI release, upstream code or weight mirror, or Phonon integration is part of this version.
+- The source repository is public. No PyPI release, weight mirror, or Phonon integration is part of this version.
 
 ## Verification
 

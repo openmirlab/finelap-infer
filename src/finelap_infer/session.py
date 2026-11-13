@@ -1,6 +1,6 @@
 """Resident FineLAP inference and long-file window/time mapping.
 
-Reads: checkpoints.resolve_snapshot, upstream HF model's frame/clip APIs,
+Reads: checkpoints.resolve_snapshot, local FineLAP model's frame API,
 soundfile for input duration and temporary waveform windows, results dataclasses.
 """
 
@@ -11,7 +11,14 @@ from pathlib import Path
 
 import soundfile as sf
 
-from .checkpoints import Checkpoint, default_checkpoint, resolve_snapshot
+from .checkpoints import (
+    Checkpoint,
+    TextAsset,
+    default_checkpoint,
+    default_text_asset,
+    resolve_snapshot,
+    resolve_text_asset,
+)
 from .results import Event, FrameScore, LocalizationResult
 
 FRAME_HOP = 0.16  # 10 ms fbank frames * 16 mel frames per temporal patch.
@@ -77,11 +84,13 @@ class FineLAPSession:
         device: str = "auto",
         cache_dir: str | Path | None = None,
         checkpoint: Checkpoint | None = None,
+        text_asset: TextAsset | None = None,
         local_files_only: bool = False,
     ) -> None:
         self.device = device
         self.cache_dir = cache_dir
         self.checkpoint = checkpoint or default_checkpoint()
+        self.text_asset = text_asset or default_text_asset()
         self.local_files_only = local_files_only
         self._model = None
         self._status = "unloaded"
@@ -97,9 +106,13 @@ class FineLAPSession:
                 cache_dir=self.cache_dir,
                 local_files_only=True,
             )
+            text_path = resolve_text_asset(
+                self.text_asset, cache_dir=self.cache_dir, local_files_only=True,
+            )
         except (OSError, ValueError, FileNotFoundError):
             return {"cached": False, "revision": self.checkpoint.revision, "path": None}
-        return {"cached": True, "revision": self.checkpoint.revision, "path": str(path)}
+        return {"cached": True, "revision": self.checkpoint.revision, "path": str(path),
+                "text_path": str(text_path), "text_revision": self.text_asset.revision}
 
     def load(self) -> FineLAPSession:
         if self._status == "closed":
@@ -107,28 +120,33 @@ class FineLAPSession:
         if self._model is not None:
             return self
         resolved_device = _device(self.device)
-        resolve_snapshot(
+        snapshot = resolve_snapshot(
             self.checkpoint,
             cache_dir=self.cache_dir,
+            local_files_only=self.local_files_only,
+        )
+        text_snapshot = resolve_text_asset(
+            self.text_asset, cache_dir=self.cache_dir,
             local_files_only=self.local_files_only,
         )
         try:
             import torchaudio  # noqa: F401 - required by upstream remote model code
         except ImportError as exc:
             raise ImportError("FineLAP needs torchaudio; install finelap-infer[model]") from exc
-        from transformers import AutoModel
+        from ._impl.configuration_finelap import FineLAPConfig
+        from ._impl.modeling_finelap import FineLAPModel
 
-        # The pinned remote code is executed, but never copied into our wheel.
-        # Transformers 4.57's local-directory dynamic-module loader fails to
-        # copy FineLAP's transitive relative imports; the pinned repo-ID path
-        # correctly resolves them from the same verified snapshot.
-        self._model = AutoModel.from_pretrained(
-            self.checkpoint.repo_id,
-            revision=self.checkpoint.revision,
-            trust_remote_code=True,
-            local_files_only=self.local_files_only,
-            cache_dir=str(self.cache_dir) if self.cache_dir is not None else None,
-        ).to(resolved_device).eval()
+        config = FineLAPConfig.from_pretrained(str(snapshot), local_files_only=True)
+        config.text_encoder_name = str(text_snapshot)
+        model, loading = FineLAPModel.from_pretrained(
+            str(snapshot),
+            config=config,
+            local_files_only=True,
+            output_loading_info=True,
+        )
+        if any(loading[key] for key in ("missing_keys", "unexpected_keys", "mismatched_keys")):
+            raise RuntimeError(f"FineLAP checkpoint does not fully match local model: {loading}")
+        self._model = model.to(resolved_device).eval()
         self._status = "ready"
         return self
 

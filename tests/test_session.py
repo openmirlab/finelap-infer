@@ -6,8 +6,9 @@ import numpy as np
 import pytest
 import soundfile as sf
 import torch
+import transformers
 
-from finelap_infer import FineLAPSession, default_checkpoint
+from finelap_infer import FineLAPSession, default_checkpoint, default_text_asset
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -62,19 +63,31 @@ def test_result_contract_import_and_config():
     checkpoint = default_checkpoint()
     assert len(checkpoint.revision) == 40
     assert len(checkpoint.sha256) == 64
+    assert len(checkpoint.config_sha256) == 64
+    assert len(default_text_asset().files) == 5
     assert FineLAPSession(device="cpu").status == "unloaded"
 
 
 @pytest.mark.model
 def test_pinned_upstream_short_audio_parity():
     """Numerical parity to the unmodified author model on true silence and a tone."""
-    if torch.__version__ != "2.7.0+cu126":
-        pytest.skip("Exact float fixture was recorded under Torch 2.7.0+cu126 CPU")
+    if torch.__version__ != "2.7.0+cu126" or transformers.__version__ != "4.57.6":
+        pytest.skip("Exact fixture requires Torch 2.7.0+cu126 and Transformers 4.57.6 CPU")
     torch.set_num_threads(4)
     expected = np.load(FIXTURES / "upstream_cpu.npz")
     with FineLAPSession(device="cpu", local_files_only=True) as session:
         result = session.infer(FIXTURES / "tone_silence.wav", ["A sine tone sounds."])
+        with torch.inference_mode():
+            raw_frames = session._model.get_frame_level_score(
+                [str(FIXTURES / "tone_silence.wav")], ["A sine tone sounds."], device="cpu"
+            ).detach().numpy()
+            raw_clip = session._model.get_clip_level_score(
+                [str(FIXTURES / "tone_silence.wav")], ["A sine tone sounds."], device="cpu"
+            ).detach().numpy()
+        assert session.cache_info()["cached"]
     actual = np.array([frame.score for frame in result.frames])
+    assert np.array_equal(raw_frames, expected["frames"])
+    assert np.array_equal(raw_clip, expected["clip"])
     np.testing.assert_allclose(actual, expected["frames"][0, 0, :len(actual)], rtol=1e-6, atol=1e-7)
     assert actual.max() > 0.8
     assert actual.min() < 0.01

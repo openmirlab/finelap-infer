@@ -2,17 +2,17 @@
 
 Public, standalone, inference-only wrapper for [FineLAP](https://github.com/xiquan-li/FineLAP). It maps FineLAP's dense audio–text scores onto the input file clock and processes files longer than the upstream model's approximately 10-second frontend limit. The model and its research belong to the FineLAP authors.
 
-**Status:** public source repository; no PyPI release. The upstream GitHub repository has no explicit code LICENSE as checked 2026-11-13. Its Hugging Face model card says MIT, but that does not by itself grant a license for the GitHub code. This repository contains only original wrapper code, no upstream implementation or checkpoint. Do not mirror upstream code or weights until their rights are clarified. Loading the pinned HF snapshot executes upstream model code via `trust_remote_code=True` at runtime.
+**Status:** public inference-only source repository; no PyPI release. The six model implementation files needed for inference are adapted from the fixed author [Hugging Face snapshot](https://huggingface.co/AndreasXi/FineLAP), whose model card declares MIT. The separate [GitHub research repo](https://github.com/xiquan-li/FineLAP) has no explicit LICENSE as checked 2026-11-13; we do not copy from that tree. We do not bundle or mirror checkpoint weights. See [source provenance](docs/source-provenance.md) and [NOTICE](NOTICE).
 
 ## Install
 
-Python 3.10+; the tested environment is Python 3.12, Torch 2.7.0+cu126 CPU mode, Transformers 4.57.6, timm 1.0.31. Install from this checkout:
+Python 3.10+; the tested model environment is Python 3.12, Torch 2.7.0+cu126 CPU mode and Transformers 4.57.6. Install from this checkout:
 
 ```bash
 uv sync --extra model --extra dev
 ```
 
-The `model` extra supplies torchaudio, required by the author's HF implementation. The base installation stays importable without torchaudio; `load()` gives an install hint if it is absent. Transformers 5 is temporarily excluded because the pinned upstream remote code failed to load in local testing; see [compatibility tracking](docs/compatibility.md).
+The `model` extra supplies torchaudio for the author's Kaldi fbank preprocessing. The base installation stays importable without torchaudio; `load()` gives an install hint if it is absent. The inference model code is local and does not use `trust_remote_code`. Transformers 5 is temporarily excluded pending parity testing; see [compatibility tracking](docs/compatibility.md).
 
 ## Use
 
@@ -35,13 +35,22 @@ Long-file clip scores and global embeddings are intentionally not exposed: the p
 
 ## Checkpoint and cache
 
-The default author HF revision and model SHA-256 are in [`config/checkpoints.toml`](src/finelap_infer/config/checkpoints.toml). The author snapshot is downloaded on first `load()`; the large weight file is SHA-256 verified. Hugging Face caches it under its default cache, normally `~/.cache/huggingface/hub`. Supply `cache_dir=` to change the model snapshot cache, or set `HF_HOME` before starting Python for the author's RoBERTa dependency too. `cache_info()` uses the same snapshot resolver as `load()` and never downloads. `device` supports `auto`, `cpu`, `cuda`, and `cuda:N`; `mps` is rejected.
+The pinned author weight/config and RoBERTa tokenizer/config revisions and SHA-256 values are in [`config/checkpoints.toml`](src/finelap_infer/config/checkpoints.toml). The two verified snapshots are downloaded on first `load()` into the Hugging Face cache, normally `~/.cache/huggingface/hub`; pass `cache_dir=` to change it. `cache_info()` checks the same two resolvers without downloading. `device` supports `auto`, `cpu`, `cuda`, and `cuda:N`; `mps` is rejected.
 
-For manual/offline placement, prefill the chosen Hugging Face cache while online: `hf download AndreasXi/FineLAP --revision b419aa22947d29907a5567f21b81bf3b39a40449 --cache-dir /your/cache`. Also cache `roberta-base` with the same tool; the author model constructs that encoder by name and will otherwise try its default cache. Then pass `cache_dir="/your/cache"` and `local_files_only=True` when loading. Use `HF_HOME` before Python starts if you need all dependencies in one offline cache. A `Checkpoint` object allows generic metadata overrides for another verified snapshot; all files remain subject to its SHA-256. Directly passing a loose local folder is not currently supported because Transformers 4.57's local-directory loader fails on this model's transitive relative imports.
+For manual/offline placement, prefill the chosen Hugging Face cache while online:
+
+```bash
+hf download AndreasXi/FineLAP config.json model.safetensors \
+  --revision b419aa22947d29907a5567f21b81bf3b39a40449 --cache-dir /your/cache
+hf download roberta-base config.json vocab.json merges.txt tokenizer.json tokenizer_config.json \
+  --revision e2da8e2f811d1448a5b465c236feacd80ffbac7b --cache-dir /your/cache
+```
+
+Then pass `cache_dir="/your/cache"` and `local_files_only=True` when loading. All files are SHA-256 checked. The FineLAP checkpoint includes RoBERTa encoder weights, so only RoBERTa config/tokenizer files are fetched. `Checkpoint` and `TextAsset` allow verified asset overrides.
 
 ## Scope and verification
 
-The shipped wheel contains inference wrapper code, checkpoint metadata, and result types. It contains no training loops, fine-tuning, dataset loaders, evaluation harness, research CLI, checkpoint weights, or copied upstream implementation. Tests include an upstream short-file parity fixture, synthetic boundary/overlap checks and a real-checkpoint late-event smoke test; model-marked tests require the cached checkpoint and optional model dependency. Run:
+The shipped wheel contains the six adapted inference model files, wrapper code, checkpoint metadata, and result types. It contains no training loops, fine-tuning, dataset loaders, evaluation harness, research CLI, or checkpoint weights. Tests include an upstream short-file parity fixture, synthetic boundary/overlap checks and a real-checkpoint late-event smoke test; model-marked tests require the cached checkpoint and optional model dependency. Run:
 
 ```bash
 uv run --extra model --extra dev pytest -q

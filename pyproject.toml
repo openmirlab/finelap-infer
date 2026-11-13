@@ -9,14 +9,14 @@ description = "Inference-only FineLAP localization for short and long audio"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{name = "openmirlab contributors"}]
+authors = [{name = "FineLAP authors"}, {name = "openmirlab contributors"}]
 maintainers = [{name = "openmirlab"}]
 dependencies = [
   "huggingface-hub>=0.30",
   "numpy>=1.26",
+  "tomli>=2; python_version < '3.11'",
   "soundfile>=0.12",
   "torch>=2.0",
-  "timm>=1.0",
   # Temporary 5.x cap: pinned upstream remote code fails with Transformers 5.x.
   # Track removal in docs/compatibility.md after upstream parity is verified.
   "transformers>=4.56.2,<5",
