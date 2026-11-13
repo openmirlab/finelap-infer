@@ -130,7 +130,7 @@ class FineLAPSession:
             local_files_only=self.local_files_only,
         )
         try:
-            import torchaudio  # noqa: F401 - required by upstream remote model code
+            import torchaudio  # noqa: F401 - required by local model resampling and fbank
         except ImportError as exc:
             raise ImportError("FineLAP needs torchaudio; install finelap-infer[model]") from exc
         from ._impl.configuration_finelap import FineLAPConfig

@@ -1,5 +1,13 @@
+"""FineLAP model and audio frontend adapted from the pinned author snapshot.
+
+SoundFile reads supported files without TorchCodec; TorchAudio retains the
+author's numerical feature pipeline.
+Reads: SoundFile for WAV/FLAC decoding; TorchAudio for resampling and Kaldi fbank.
+"""
+
 import os
 
+import soundfile as sf
 import torch
 import torch.nn.functional as F
 import torchaudio
@@ -60,7 +68,8 @@ class FineLAPModel(PreTrainedModel):
         target_len = 1024
 
         for source_path in audio_paths:
-            wav, sr = torchaudio.load(source_path)
+            samples, sr = sf.read(source_path, dtype="float32", always_2d=True)
+            wav = torch.from_numpy(samples.T.copy())
             if wav.shape[0] > 1:
                 wav = wav.mean(dim=0, keepdim=True)
             if sr != 16000:

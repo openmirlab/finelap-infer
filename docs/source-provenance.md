@@ -17,7 +17,9 @@ they define the checkpoint architecture and frame-score computation:
 
 Changes: removed the plot helper, replaced timm's required layer functions
 with `layers.py`, built RoBERTa from its pinned config instead of fetching a
-second weight file, and loaded the author model through the local class.
+second weight file, loaded the author model through the local class, and
+replaced `torchaudio.load()` with SoundFile WAV/FLAC decoding while retaining
+the original resampling and Kaldi fbank pipeline.
 No train scripts, datasets, evaluation metrics, or model weights are shipped.
 
 On two real Rytho sample previews (10-second 16 kHz mono files), the local
@@ -29,5 +31,7 @@ The committed `tests/fixtures/upstream_cpu.npz` was captured with the
 unmodified author model before extraction. Under the recorded CPU environment
 (Torch 2.7.0+cu126, Transformers 4.57.6, four threads), the extracted path
 returned bit-identical frame and clip scores on that fixture. The package
-regression test covers frame scores; a direct comparison also covered clip
-scores during extraction. Real long-file localization remains a separate test.
+regression test covers frame and clip scores. On Torch 2.15.0+cu132 and
+TorchAudio 2.11.1+cu132, the same fixture differs by at most 4.47e-7 in frame
+scores on a 0.918 score range and 1.49e-8 in clip score; the version-guarded
+test checks this tolerance. Real long-file localization remains a separate test.

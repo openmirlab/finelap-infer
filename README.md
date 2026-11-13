@@ -41,13 +41,13 @@ This package supports localization only. It does not expose full-file clip score
 
 ## Install
 
-Python 3.10+; the tested model environment is Python 3.12, Torch 2.7.0+cu126 CPU mode and Transformers 4.57.6. Install from public GitHub:
+Python 3.10+; tested CPU model environments include Python 3.12 with Torch 2.7.0+cu126 or Torch 2.15.0+cu132 / TorchAudio 2.11.1+cu132, and Transformers 4.57.6. Install from public GitHub:
 
 ```bash
 pip install 'finelap-infer[model] @ git+https://github.com/openmirlab/finelap-infer.git'
 ```
 
-There is no PyPI release. For a local development checkout, run `uv sync --extra model --extra dev`. The `model` extra supplies torchaudio for the author's Kaldi fbank preprocessing; its binary must match Torch. The base installation stays importable without torchaudio; `load()` gives an install hint if it is absent. The inference model code is local and does not use `trust_remote_code`. Transformers 5 is temporarily excluded pending parity testing; see [compatibility tracking](docs/compatibility.md).
+There is no PyPI release. For a local development checkout, run `uv sync --extra model --extra dev`. SoundFile decodes WAV/FLAC inputs; the `model` extra supplies torchaudio for the author's resampling and Kaldi fbank preprocessing, and its binary must match Torch. TorchCodec and shared FFmpeg are not needed for these inputs. The base installation stays importable without torchaudio; `load()` gives an install hint if it is absent. The inference model code is local and does not use `trust_remote_code`. Transformers 5 is temporarily excluded pending parity testing; see [compatibility tracking](docs/compatibility.md).
 
 ## Quick start
 
@@ -91,7 +91,7 @@ The wheel contains the six adapted inference model files, localization code, che
 
 ## Development
 
-Tests include an upstream short-file parity fixture, synthetic boundary/overlap checks and a real-checkpoint late-event smoke test; model-marked tests require the cached checkpoint and optional model dependency. From a checkout, run:
+Tests include WAV/FLAC frontend parity without TorchCodec, an upstream short-file parity fixture, synthetic boundary/overlap checks and a real-checkpoint late-event smoke test; model-marked tests require the cached checkpoint and optional model dependency. From a checkout, run:
 
 ```bash
 uv run --extra model --extra dev pytest -q

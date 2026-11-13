@@ -6,6 +6,7 @@ Public standalone inference-only package for FineLAP. Original research is by Xi
 
 - Only localization and its native score/time semantics. No training, fine-tuning, datasets, evaluation or experiment commands in the installed surface.
 - `checkpoints.py` owns the two verified asset resolvers shared by load and cache inspection. `session.py` owns lifecycle, device, windowing and calls into the local `_impl` model. `results.py` owns output meanings. CLI delegates to the session.
+- `_impl/modeling_finelap.py` decodes WAV/FLAC with SoundFile, then retains TorchAudio resampling and Kaldi fbank. The `model` extra still provides TorchAudio; TorchCodec and shared FFmpeg are not needed for these inputs. `tests/test_audio_decoding.py` checks original PCM16 decode semantics and the public `infer()` path while forcing `torchaudio.load()` to fail.
 - 10-second windows, 8-second hop, 0.16-second nominal score bins. Overlap uses max. Event intervals are thresholded nominal bins, not sample-accurate boundaries or calibrated probabilities.
 - Use local fixed-revision source for tests. Any change to model code/dependencies, windowing, score interpretation or timing must refresh source evidence and upstream parity.
 - The source repository is public; install from GitHub with `pip install 'finelap-infer[model] @ git+https://github.com/openmirlab/finelap-infer.git'`. No PyPI release, weight mirror, or Phonon integration is part of this version. Load-bearing source files carry a title/rationale/`Reads:` navigation header; keep it accurate when editing.

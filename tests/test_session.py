@@ -71,8 +71,10 @@ def test_result_contract_import_and_config():
 @pytest.mark.model
 def test_pinned_upstream_short_audio_parity():
     """Numerical parity to the unmodified author model on true silence and a tone."""
-    if torch.__version__ != "2.7.0+cu126" or transformers.__version__ != "4.57.6":
-        pytest.skip("Exact fixture requires Torch 2.7.0+cu126 and Transformers 4.57.6 CPU")
+    exact_env = torch.__version__ == "2.7.0+cu126"
+    compatible_env = torch.__version__ == "2.15.0+cu132"
+    if not (exact_env or compatible_env) or transformers.__version__ != "4.57.6":
+        pytest.skip("Fixture verified on Torch 2.7.0+cu126 or 2.15.0+cu132, Transformers 4.57.6 CPU")
     torch.set_num_threads(4)
     expected = np.load(FIXTURES / "upstream_cpu.npz")
     with FineLAPSession(device="cpu", local_files_only=True) as session:
@@ -86,8 +88,12 @@ def test_pinned_upstream_short_audio_parity():
             ).detach().numpy()
         assert session.cache_info()["cached"]
     actual = np.array([frame.score for frame in result.frames])
-    assert np.array_equal(raw_frames, expected["frames"])
-    assert np.array_equal(raw_clip, expected["clip"])
+    if exact_env:
+        assert np.array_equal(raw_frames, expected["frames"])
+        assert np.array_equal(raw_clip, expected["clip"])
+    else:
+        np.testing.assert_allclose(raw_frames, expected["frames"], rtol=1e-6, atol=5e-7)
+        np.testing.assert_allclose(raw_clip, expected["clip"], rtol=1e-6, atol=5e-7)
     np.testing.assert_allclose(actual, expected["frames"][0, 0, :len(actual)], rtol=1e-6, atol=1e-7)
     assert actual.max() > 0.8
     assert actual.min() < 0.01
@@ -96,8 +102,8 @@ def test_pinned_upstream_short_audio_parity():
 @pytest.mark.model
 def test_real_model_localizes_after_first_window(tmp_path):
     """Real checkpoint must see a source placed past the upstream 10-second limit."""
-    if torch.__version__ != "2.7.0+cu126":
-        pytest.skip("Threshold fixture was recorded under Torch 2.7.0+cu126 CPU")
+    if torch.__version__ not in ("2.7.0+cu126", "2.15.0+cu132"):
+        pytest.skip("Threshold fixture verified on Torch 2.7.0+cu126 and 2.15.0+cu132 CPU")
     torch.set_num_threads(4)
     rate = 16000
     wave = np.zeros(18 * rate, dtype=np.float32)
