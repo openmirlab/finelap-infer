@@ -2,7 +2,10 @@ FineLAP model and research: xiquan-li and FineLAP contributors.
 Source: https://github.com/xiquan-li/FineLAP
 Checkpoint: https://huggingface.co/AndreasXi/FineLAP
 
-This package contains only new inference wrapper code. It does not include the
-author model implementation or model weights. Loading the model executes the
-author's pinned Hugging Face remote code. Upstream code license remains unclear;
-this package stays private pending rights clarification.
+This public repository contains only original inference wrapper code under
+the repository's MIT license. It does not include the author model
+implementation or model weights. Loading the model fetches and executes the
+author's pinned Hugging Face remote code. The author GitHub source repository
+has no explicit LICENSE as of 2026-11-13, despite the Hugging Face model
+card's MIT tag. This MIT license covers only the wrapper in this repository;
+it does not grant rights to third-party code or model assets.

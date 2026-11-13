@@ -1,8 +1,8 @@
 # finelap-infer
 
-Private, standalone, inference-only wrapper for [FineLAP](https://github.com/xiquan-li/FineLAP). It maps FineLAP's dense audio–text scores onto the input file clock and processes files longer than the upstream model's approximately 10-second frontend limit. The model and its research belong to the FineLAP authors.
+Public, standalone, inference-only wrapper for [FineLAP](https://github.com/xiquan-li/FineLAP). It maps FineLAP's dense audio–text scores onto the input file clock and processes files longer than the upstream model's approximately 10-second frontend limit. The model and its research belong to the FineLAP authors.
 
-**Status:** local private package. The upstream GitHub repository has no explicit code LICENSE as checked 2026-11-13. Its Hugging Face model card says MIT, but that does not by itself grant a license for the GitHub code. This package does not vendor upstream code or checkpoints. Do not publish this package or mirror the checkpoint until the rights are clarified. The pinned HF snapshot executes upstream model code via `trust_remote_code=True` at load time.
+**Status:** public source repository; no PyPI release. The upstream GitHub repository has no explicit code LICENSE as checked 2026-11-13. Its Hugging Face model card says MIT, but that does not by itself grant a license for the GitHub code. This repository contains only original wrapper code, no upstream implementation or checkpoint. Do not mirror upstream code or weights until their rights are clarified. Loading the pinned HF snapshot executes upstream model code via `trust_remote_code=True` at runtime.
 
 ## Install
 
