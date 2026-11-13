@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Upstream's pinned model code imports torchaudio. Keep this compiled dependency
+# The model uses torchaudio resampling and Kaldi fbank. Keep this compiled dependency
 # outside the base install; loading the model without it raises an install hint.
 model = ["torchaudio>=2.0"]
 dev = ["build>=1.3", "pytest>=8", "ruff>=0.8"]
