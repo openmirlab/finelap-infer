@@ -1,6 +1,6 @@
 # finelap-infer maintainer guide
 
-Public standalone inference-only package for FineLAP. Read README, `docs/compatibility.md` and `docs/source-provenance.md` before changes. The inference-required author Python files were extracted from the MIT-tagged Hugging Face snapshot in `src/finelap_infer/config/checkpoints.toml` into `_impl/`. The separate GitHub research tree has no explicit LICENSE and is not the code source. Weights are never bundled. Do not add upstream training/evaluation code or mirror weights. Confirm rights with the author before a PyPI release.
+Public standalone inference-only package for FineLAP. Original research is by Xiquan Li, Xuenan Xu, Ziyang Ma, Wenxi Chen, Haolin He, Qiuqiang Kong, and Xie Chen; the checkpoint is hosted at `AndreasXi/FineLAP`. Read README, `docs/compatibility.md` and `docs/source-provenance.md` before changes. The inference-required author Python files were extracted from the MIT-tagged Hugging Face snapshot in `src/finelap_infer/config/checkpoints.toml` into `_impl/`. The separate GitHub research tree has no explicit LICENSE and is not the code source. Weights are never bundled. Do not add upstream training/evaluation code or mirror weights. Confirm rights with the author before a PyPI release.
 
 ## Scope and lifecycle
 
@@ -8,7 +8,7 @@ Public standalone inference-only package for FineLAP. Read README, `docs/compati
 - `checkpoints.py` owns the two verified asset resolvers shared by load and cache inspection. `session.py` owns lifecycle, device, windowing and calls into the local `_impl` model. `results.py` owns output meanings. CLI delegates to the session.
 - 10-second windows, 8-second hop, 0.16-second nominal score bins. Overlap uses max. Event intervals are thresholded nominal bins, not sample-accurate boundaries or calibrated probabilities.
 - Use local fixed-revision source for tests. Any change to model code/dependencies, windowing, score interpretation or timing must refresh source evidence and upstream parity.
-- The source repository is public. No PyPI release, weight mirror, or Phonon integration is part of this version.
+- The source repository is public; install from GitHub with `pip install 'finelap-infer[model] @ git+https://github.com/openmirlab/finelap-infer.git'`. No PyPI release, weight mirror, or Phonon integration is part of this version. Load-bearing source files carry a title/rationale/`Reads:` navigation header; keep it accurate when editing.
 
 ## Verification
 
