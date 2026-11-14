@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Gate pushes and pull requests with Python 3.10–3.15 offline tests, lint, and a clean wheel-from-sdist import check; keep runtime-specific model parity separate.
 - Decode WAV/FLAC with SoundFile so inference no longer requires TorchCodec or shared FFmpeg on newer TorchAudio; preserve TorchAudio resampling and Kaldi fbank, with frontend parity tests.
 - Reorganized the README around upstream credit, citation, public GitHub installation, usage, weights, development, license, and support.
 

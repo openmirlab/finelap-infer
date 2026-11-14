@@ -93,6 +93,11 @@ The wheel contains the six adapted inference model files, localization code, che
 
 Tests include WAV/FLAC frontend parity without TorchCodec, an upstream short-file parity fixture, synthetic boundary/overlap checks and a real-checkpoint late-event smoke test; model-marked tests require the cached checkpoint and optional model dependency. From a checkout, run:
 
+GitHub CI runs the offline tests and lint on Python 3.10–3.15, then builds a
+wheel from the sdist and imports it from a clean Python 3.12 environment.
+The real-checkpoint tests remain separate because their fixture is tied to
+specific Torch/Transformers builds and requires the checkpoint asset.
+
 ```bash
 uv run --extra model --extra dev pytest -q
 uv run --extra model --extra dev pytest -q -m model

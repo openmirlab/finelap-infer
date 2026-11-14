@@ -13,6 +13,12 @@ Public standalone inference-only package for FineLAP. Original research is by Xi
 
 ## Verification
 
+`.github/workflows/ci.yml` gates pushes and pull requests with offline tests
+and lint on Python 3.10–3.15, followed by a clean installed-wheel smoke on
+Python 3.12. It deliberately excludes `model` tests: those need the pinned
+checkpoint and the recorded Torch/Transformers CPU runtime; run them separately
+for release parity, without interpreting a skip as a pass.
+
 ```bash
 uv sync --extra model --extra dev
 uv run --extra model --extra dev pytest -q
